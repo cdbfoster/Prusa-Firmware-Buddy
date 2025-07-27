@@ -513,14 +513,13 @@
               crash_s.set_gcode_replay_flags(Crash_s::RECOVER_AXIS_STATE);
             #endif
 
-            if (xy_seen && g29_size_seen) {
-              probe_major_points(g29_pos, g29_pos + g29_size, parser.seen('T'), parser.seen('E'));
-            } else {
-              /// probe area is print area enlarged by one major point
-              auto probe_area = print_area.get_bounding_rect().inset(-MESH_X_DIST * GRID_MAJOR_STEP,
-                                                                     -MESH_Y_DIST * GRID_MAJOR_STEP);
-              probe_major_points(probe_area.a, probe_area.b, parser.seen('T'), parser.seen('E'));
-            }
+            const auto probe_area = (xy_seen && g29_size_seen) ?
+              PrintArea::rect_t(g29_pos, g29_pos + g29_size) :
+              // probe area is print area enlarged by one major point
+              print_area.get_bounding_rect().inset(-MESH_X_DIST * GRID_MAJOR_STEP,
+                                                   -MESH_Y_DIST * GRID_MAJOR_STEP);
+
+            probe_major_points(probe_area, parser.seen('T'), parser.seen('E'));
 
             report_current_position();
             probe_deployed = true;
@@ -835,11 +834,8 @@
           #endif
         }
   }
-  int unified_bed_leveling::count_points_to_probe(){
 
-    /// probe area is print area enlarged by one major point
-    auto probe_area = print_area.get_bounding_rect().inset(-MESH_X_DIST * GRID_MAJOR_STEP,
-                                                           -MESH_Y_DIST * GRID_MAJOR_STEP);
+  int unified_bed_leveling::count_points_to_probe(const PrintArea::rect_t &probe_area){
     // count points that are reachable to be probed
     int num_of_points_to_probe = 0;
     for (int y = GRID_MAX_POINTS_Y - GRID_BORDER - 1; y >= GRID_BORDER; y -= GRID_MAJOR_STEP) {
@@ -947,7 +943,7 @@
       );
     }
 
-    void unified_bed_leveling::probe_major_points(const xy_pos_t area_a, const xy_pos_t area_b, const bool do_ubl_mesh_map, const bool stow_probe) {
+    void unified_bed_leveling::probe_major_points(const PrintArea::rect_t &probe_area, const bool do_ubl_mesh_map, const bool stow_probe) {
       save_ubl_active_state_and_disable();  // No bed level correction so only raw data is obtained
 
       #if ENABLED(NOZZLE_LOAD_CELL)
@@ -964,11 +960,9 @@
         }
       #endif
 
-      PrintArea::rect_t probe_area(area_a, area_b);
-
       bool is_initial_probe = true;
       #if DISABLED(UBL_DONT_REPORT_POINT_COUNT)
-      const int num_of_points_to_probe = count_points_to_probe();
+      const int num_of_points_to_probe = count_points_to_probe(probe_area);
       #endif /*DISABLED(UBL_DONT_REPORT_POINT_COUNT)*/
       int num_of_probed_points = 0;
       // enumerate over all major points

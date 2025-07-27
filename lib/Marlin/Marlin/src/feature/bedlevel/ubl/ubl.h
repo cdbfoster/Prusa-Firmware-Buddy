@@ -24,6 +24,7 @@
 //#define UBL_DEVEL_DEBUGGING
 
 #include "../../../module/motion.h"
+#include "../../../feature/print_area.h"
 
 #define DEBUG_OUT ENABLED(DEBUG_LEVELING_FEATURE)
 #include "../../../core/debug_out.h"
@@ -69,11 +70,11 @@ class unified_bed_leveling {
       static void manually_probe_remaining_mesh(const xy_pos_t&, const float&, const float&, const bool) __O0;
       static void fine_tune_mesh(const xy_pos_t &pos, const bool do_ubl_mesh_map) __O0;
     #endif
-    static int count_points_to_probe();
+    static int count_points_to_probe(const PrintArea::rect_t &probe_area);
     static bool g29_parameter_parsing() __O0;
     static void shift_mesh_height();
     static void probe_entire_mesh(const xy_pos_t &near, const bool do_ubl_mesh_map, const bool stow_probe, const bool do_furthest) __O0;
-    static void probe_major_points(const xy_pos_t area_a, const xy_pos_t area_b, const bool do_ubl_mesh_map, const bool stow_probe);
+    static void probe_major_points(const PrintArea::rect_t &probe_area, const bool do_ubl_mesh_map, const bool stow_probe);
     static void tilt_mesh_based_on_3pts(const float &z1, const float &z2, const float &z3);
     static void tilt_mesh_based_on_probed_grid(const bool do_ubl_mesh_map);
     static bool smart_fill_one(const uint8_t x, const uint8_t y, const int8_t xdir, const int8_t ydir);
