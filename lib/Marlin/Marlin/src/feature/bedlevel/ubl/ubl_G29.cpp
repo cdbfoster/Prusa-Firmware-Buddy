@@ -314,14 +314,14 @@
   #if PRINTER_IS_PRUSA_MK3_5() || PRINTER_IS_PRUSA_MINI()
 
   // Apply weighted correction on each point based on it's location.
-  // The whole correction is then conversed from µm to mm. 
+  // The whole correction is then conversed from µm to mm.
 
   float x_axis_correction(int x, int y) {
     int32_t left_correction_um{config_store().left_bed_correction.get()};
     int32_t right_correction_um{config_store().right_bed_correction.get()};
 
     int32_t x_len{GRID_MAX_POINTS_X-1};
-    
+
     return ( (left_correction_um*(x_len-x)) + (right_correction_um*(x)) ) / static_cast<float>(x_len);
   }
 
@@ -837,10 +837,10 @@
   }
   int unified_bed_leveling::count_points_to_probe(){
 
-/// probe area is print area enlarged by one major point
+    /// probe area is print area enlarged by one major point
     auto probe_area = print_area.get_bounding_rect().inset(-MESH_X_DIST * GRID_MAJOR_STEP,
                                                            -MESH_Y_DIST * GRID_MAJOR_STEP);
-// count points that are reachable to be probed
+    // count points that are reachable to be probed
     int num_of_points_to_probe = 0;
     for (int y = GRID_MAX_POINTS_Y - GRID_BORDER - 1; y >= GRID_BORDER; y -= GRID_MAJOR_STEP) {
       int y_idx = (y - GRID_BORDER) / GRID_MAJOR_STEP;
@@ -968,10 +968,10 @@
 
       bool is_initial_probe = true;
       #if DISABLED(UBL_DONT_REPORT_POINT_COUNT)
-      const int  num_of_points_to_probe = count_points_to_probe();
+      const int num_of_points_to_probe = count_points_to_probe();
       #endif /*DISABLED(UBL_DONT_REPORT_POINT_COUNT)*/
       int num_of_probed_points = 0;
-       // enumerate over all major points
+      // enumerate over all major points
       for (int y = GRID_MAX_POINTS_Y - GRID_BORDER - 1; y >= GRID_BORDER; y -= GRID_MAJOR_STEP) {
         int y_idx = (y - GRID_BORDER) / GRID_MAJOR_STEP;
         bool is_odd_y_position = y_idx % 2 == 1;
@@ -1034,11 +1034,11 @@
           const auto prev_measured_z = g29_min_max_measured_z.value_or(std::make_pair(measured_z, measured_z));
           g29_min_max_measured_z = { std::min(prev_measured_z.first, measured_z), std::max(prev_measured_z.second, measured_z) };
           log_info(Marlin, "Measured z: %f", (double) measured_z);
-          
+
           #if PRINTER_IS_PRUSA_MK3_5() || PRINTER_IS_PRUSA_MINI()
             //apply bed level correction on each probed point
             apply_bed_level_correction(x,y);
-          #endif 
+          #endif
 
           #if ENABLED(EXTENSIBLE_UI)
             ExtUI::onMeshUpdate(x, y, measured_z);
