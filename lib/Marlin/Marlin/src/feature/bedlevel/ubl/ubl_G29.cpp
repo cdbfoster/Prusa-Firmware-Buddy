@@ -314,7 +314,7 @@
   #if PRINTER_IS_PRUSA_MK3_5() || PRINTER_IS_PRUSA_MINI()
 
   // Apply weighted correction on each point based on it's location.
-  // The whole correction is then conversed from µm to mm.
+  // The whole correction is then converted from µm to mm.
 
   float x_axis_correction(int x, int y) {
     int32_t left_correction_um{config_store().left_bed_correction.get()};
